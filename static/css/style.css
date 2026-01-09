@@ -1,0 +1,374 @@
+/* static/css/style.css */
+
+/* --- 1. GLOBAL THEME OVERRIDES (New!) --- */
+/* This forces all Bootstrap blue text/buttons to be Orange */
+:root {
+    --primary-orange: #ff6600df;
+    --primary-orange-hover: #e65c00e3;
+    --primary-orange-soft: rgba(255, 102, 0, 0.1);
+}
+/* --- FIX BUTTON CLICK/FOCUS COLORS --- */
+
+/* 1. Solid Orange Button (Save/New) */
+.btn-primary:active, 
+.btn-primary:focus, 
+.btn-primary.active {
+    background-color: #cc5200 !important; /* Darker Orange for 'Pressed' look */
+    border-color: #cc5200 !important;
+    /* This removes the Blue Glow Ring and adds an Orange one */
+    box-shadow: 0 0 0 0.25rem rgba(255, 102, 0, 0.25) !important; 
+}
+
+/* 2. Outline Orange Button (View Invoices) */
+.btn-outline-primary:active, 
+.btn-outline-primary:focus, 
+.btn-outline-primary.active {
+    background-color: var(--primary-orange) !important;
+    border-color: var(--primary-orange) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 0.25rem rgba(255, 102, 0, 0.25) !important;
+}
+
+/* 3. Fix the White Logout Button Focus Ring */
+.btn-white:focus, 
+.btn-white:active {
+    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important; /* Red Glow for Logout */
+}
+.text-primary {
+    color: var(--primary-orange) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary-orange);
+    border-color: var(--primary-orange);
+}
+.btn-primary:hover {
+    background-color: var(--primary-orange-hover);
+    border-color: var(--primary-orange-hover);
+}
+
+.btn-outline-primary {
+    color: var(--primary-orange);
+    border-color: var(--primary-orange);
+}
+.btn-outline-primary:hover {
+    background-color: var(--primary-orange);
+    border-color: var(--primary-orange);
+}
+
+
+/* --- 2. LAYOUT & UTILS --- */
+.dropdown-menu {
+    max-height: 200px;
+    overflow-y: auto;
+    border-color: #eee;
+}
+
+/* Sticky Summary */
+.sticky-summary {
+    position: sticky;
+    top: 20px;
+    z-index: 100;
+}
+
+.summary-card {
+    background-color: #fffaf5; /* Slight warm tint */
+    border-left: 5px solid var(--primary-orange); /* Orange Border */
+}
+
+/* Messages Container */
+.messages-container {
+    position: fixed;
+    top: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000;
+    width: 90%;
+    max-width: 450px;
+}
+
+/* Modern Alert */
+.alert-modern {
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: slideIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+/* Keep semantic colors (Success=Green, Danger=Red), but Info can be Orange */
+.alert-modern.success { border-left: 6px solid #2ecc71; color: #1e6b3c; }
+.alert-modern.danger, .alert-modern.error { border-left: 6px solid #e74c3c; color: #7b1e1e; }
+.alert-modern.info { border-left: 6px solid #ff6600; color: #964000; } /* Changed Info to Orange */
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (min-width: 992px) {
+    .messages-container {
+        width: 100%;
+        max-width: 800px;
+    }
+}
+
+.btn-close-custom {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0.4;
+    padding-left: 15px;
+}
+
+.btn-close-custom:hover { opacity: 1; color: #000; }
+
+/* Card Container */
+.dashboard-card {
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    padding: 25px;
+    border: 1px solid rgba(0,0,0,0.02);
+}
+
+/* Modern Search Bar */
+.search-wrapper {
+    position: relative;
+    max-width: 400px;
+}
+.search-input {
+    background: #fff8f5; /* Very light orange background */
+    border: 2px solid var(--primary-orange);
+    border-radius: 50px;
+    padding: 12px 20px 12px 45px;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+.search-input:focus {
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(255, 102, 0, 0.15); /* Orange Glow */
+    outline: none;
+}
+.search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #ffaa80; /* Light Orange Icon */
+}
+
+/* --- 3. TABLE STYLING --- */
+.table-modern {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+}
+.table-modern thead th {
+    border: none;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #888;
+    font-weight: 700;
+    padding: 15px;
+    cursor: pointer;
+    user-select: none;
+    background-color: #fffaf5; /* Warm Header Background */
+}
+/* Header Hover */
+.table-modern thead th:hover {
+    color: var(--primary-orange);
+}
+
+/* Sticky Header Logic */
+.table-modern thead th {
+    position: sticky; 
+    top: 0; 
+    z-index: 20; 
+}
+.table-modern thead th:first-child { border-top-left-radius: 10px; }
+.table-modern thead th:last-child { border-top-right-radius: 10px; }
+
+.table-modern tbody tr {
+    background: #ffffff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.table-modern tbody tr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 102, 0, 0.1); /* Orange Shadow on hover */
+    z-index: 10;
+    position: relative;
+}
+.table-modern td {
+    padding: 15px;
+    vertical-align: middle;
+    border-top: 1px solid #f2f2f2;
+    border-bottom: 1px solid #f2f2f2;
+}
+.table-modern td:first-child {
+    border-left: 1px solid #f2f2f2;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    font-weight: bold;
+    color: var(--primary-orange); /* Orange Invoice Numbers */
+}
+.table-modern td:last-child {
+    border-right: 1px solid #f2f2f2;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+/* Status Badges */
+.badge-soft {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+.badge-soft-success { background: #d1e7dd; color: #0f5132; }
+.badge-soft-warning { background: #fff3cd; color: #664d03; }
+.badge-soft-danger  { background: #f8d7da; color: #842029; }
+
+/* Sort Arrows */
+.sort-icon {
+    color: #333333;
+    font-weight: 700;
+    font-size: 1.05em;
+}
+.sort-icon::after {
+    content: '↕';
+    font-size: 1.2em;
+    margin-left: 8px;
+    opacity: 0.95;
+    color: #222222;
+}
+.asc .sort-icon::after { content: '↑'; opacity: 1; color: #111111; }
+.desc .sort-icon::after { content: '↓'; opacity: 1; color: #111111; }
+
+
+/* --- 4. FORM INPUTS --- */
+
+/* Base Style for ALL Inputs */
+.form-control, .form-select {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 12px 15px;
+    font-size: 0.95rem;
+    background-color: #fcfcfc;
+    transition: all 0.3s ease;
+}
+
+/* Special Case: Inputs inside an 'Input Group' */
+.input-group .form-control {
+    border-left: none;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* The Icon Box Style */
+.input-group-text {
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-right: none;
+    border-radius: 10px 0 0 10px;
+    color: #ffaa80; /* Light Orange Icons */
+    padding-left: 15px;
+}
+
+/* Focus States (ORANGE GLOW) */
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-orange);
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(255, 102, 0, 0.15); /* Orange Glow */
+    outline: none;
+}
+
+/* Highlight the icon when its input is clicked */
+.input-group:focus-within .input-group-text {
+    border-color: var(--primary-orange);
+    box-shadow: 0 0 0 4px rgba(255, 102, 0, 0.15);
+}
+.input-group:focus-within .input-group-text,
+.input-group:focus-within .form-control {
+    border-color: var(--primary-orange);
+    box-shadow: none;
+}
+.input-group:focus-within {
+    box-shadow: 0 0 0 4px rgba(255, 102, 0, 0.15);
+    border-radius: 10px;
+}
+
+/* Labels */
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* --- 5. PAGE BACKGROUNDS --- */
+
+/* Modern Background Gradient (Warm White/Orange) */
+body {
+    background: linear-gradient(135deg, #fffbf7 0%, #ffecd9 100%); /* Warm sunset gradient */
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Login Page Centering */
+body.login-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* The Card Container (Login) */
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 15px;
+}
+
+/* The Brand Logo Circle */
+.brand-logo {
+    width: 80px;
+    height: 80px;
+    /* background: var(--primary-orange); ORANGE LOGO BG */
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* font-size: 32px; */
+    margin: 0 auto 25px;
+    /* box-shadow: 0 10px 20px rgba(255, 102, 0, 0.3); Orange Shadow */
+}
+
+/* Custom Alert Styling */
+.alert {
+    border-radius: 10px;
+    font-size: 0.9rem;
+    border: none;
+}
+.alert-danger {
+    background-color: #fef2f2;
+    color: #991b1b;
+    border-left: 4px solid #ef4444;
+}
+
+/* Logout Button Hover Override */
+.btn-white:hover {
+    background-color: #dc3545 !important;
+    color: white !important;
+}
