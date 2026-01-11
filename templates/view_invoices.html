@@ -63,17 +63,25 @@
                 </a>
             </div>
         </div>
-
+        
+        <div class="mb-3 d-flex justify-content-end align-items-center">
+            <!-- <h4 class="text- kinaav">Invoices</h4> -->
+            <button type="button" class="btn btn-outline-primary" onclick="exportSelectedData()">
+                <i class="fas fa-file-export"></i> Export Selected to Excel
+            </button>
+        </div>
         <div class="dashboard-card">
             <div class="table-responsive">
+                
                 <table class="table table-modern" id="invoiceTable">
                     <thead>
                         <tr>
-                            <th onclick="sortTable(0)">Invoice No <span class="sort-icon"></span></th>
-                            <th onclick="sortTable(1)">Date <span class="sort-icon"></span></th>
-                            <th onclick="sortTable(2)">Customer <span class="sort-icon"></span></th>
-                            <th onclick="sortTable(3)">Amount <span class="sort-icon"></span></th>
-                            <th onclick="sortTable(4)">Balance <span class="sort-icon"></span></th>
+                            <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>
+                            <th onclick="sortTable(1)">Invoice No <span class="sort-icon"></span></th>
+                            <th onclick="sortTable(2)">Date <span class="sort-icon"></span></th>
+                            <th onclick="sortTable(3)">Customer <span class="sort-icon"></span></th>
+                            <th onclick="sortTable(4)">Amount <span class="sort-icon"></span></th>
+                            <th onclick="sortTable(5)">Balance <span class="sort-icon"></span></th>
                             <th>Status</th>
                             <th class="text-end">Actions</th>
                         </tr>
@@ -81,6 +89,7 @@
                     <tbody>
                         {% for row in invoices %}
                         <tr>
+                            <td><input type="checkbox" class="row-checkbox" value="{{ row.id }}"></td>
                             <td>{{ row.id }}</td>
                             <td data-date="{{ row.date }}">{{ row.date.strftime('%d-%b-%Y') if row.date else '' }}</td>
                             <td>{{ row.customer }}</td>
@@ -124,7 +133,6 @@
     </div>
 
     <script>
-        // --- SEARCH FUNCTION (unchanged, but included for completeness) ---
         document.getElementById('searchInput').addEventListener('keyup', function () {
             let filter = this.value.toLowerCase();
             let rows = document.querySelectorAll('#invoiceTable tbody tr');
@@ -132,15 +140,27 @@
 
             rows.forEach(row => {
                 let text = row.innerText.toLowerCase();
+                let checkbox = row.querySelector('.row-checkbox'); // Find the checkbox in this row
+
                 if (text.includes(filter)) {
                     row.style.display = '';
                     hasVisibleRow = true;
                 } else {
                     row.style.display = 'none';
+                    // ADDED LINE: Uncheck the box if the row is hidden
+                    if (checkbox) {
+                        checkbox.checked = false;
+                    }
                 }
             });
 
             document.getElementById('noResults').style.display = hasVisibleRow ? 'none' : 'block';
+            
+            // Pro-Tip: Uncheck the "Select All" header box if the search changes
+            let selectAllHeader = document.getElementById('selectAll');
+            if (selectAllHeader) {
+                selectAllHeader.checked = false;
+            }
         });
 
         // --- NEW FAST SORT FUNCTION ---
@@ -206,6 +226,70 @@
             // 4. Put sorted rows back into the table
             rows.forEach(row => tbody.appendChild(row));
         }
+        function toggleAll(source) {
+            // Only toggle checkboxes that are currently visible (important for searched results)
+            const checkboxes = document.querySelectorAll('#invoiceTable tbody tr:not([style*="display: none"]) .row-checkbox');
+            checkboxes.forEach(cb => cb.checked = source.checked);
+        }
+        function exportSelectedData() {
+            let selectedIds = [];
+            const allCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+            
+            // 1. If checkboxes are checked, use those
+            if (allCheckboxes.length > 0) {
+                allCheckboxes.forEach(cb => selectedIds.push(cb.value));
+            } else {
+                // 2. If nothing is checked, export all currently VISIBLE rows (useful for search)
+                const visibleRows = document.querySelectorAll('#invoiceTable tbody tr:not([style*="display: none"]) .row-checkbox');
+                visibleRows.forEach(cb => selectedIds.push(cb.value));
+            }
+
+            if (selectedIds.length === 0) {
+                alert("No data available to export.");
+                return;
+            }
+            // 4. Send the IDs to Flask (Same fetch logic as before)
+            fetch('/export-invoices', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ids: selectedIds })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Export failed');
+                return response.blob(); // Convert the response to a binary blob
+            })
+            .then(blob => {
+                // Create a hidden link to trigger the download
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Invoices-List-${new Date().toLocaleDateString()}.xlsx`;
+                document.body.appendChild(a);
+                a.click();
+                
+                // Cleanup
+                window.URL.revokeObjectURL(url);
+                a.remove();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Something went wrong during the export.');
+            });
+            
+        }
+        document.querySelectorAll('#invoiceTable tbody tr').forEach(row => {
+            row.addEventListener('click', function(e) {
+                // Prevent double-toggle if they actually clicked the checkbox itself
+                if (e.target.type !== 'checkbox') {
+                    const cb = this.querySelector('.row-checkbox');
+                    if (cb) {
+                        cb.checked = !cb.checked;
+                        // If you implemented the 'selectedCount' from before, call it here:
+                        if (typeof updateCount === "function") updateCount();
+                    }
+                }
+            });
+        });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 

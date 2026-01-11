@@ -1,8 +1,11 @@
 import os
 from dotenv import load_dotenv
-from flask import Flask, render_template, request, redirect, flash
+from flask import Flask, render_template, request, redirect, flash, send_file
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 import mysql.connector as mysql
+import pandas, openpyxl
+from datetime import datetime
+from io import BytesIO
 
 load_dotenv()
 
@@ -266,6 +269,7 @@ def edit_invoice(invoice_id):
                            items=items)
 
 @app.route('/delete-invoice/<invoice_id>', methods=['GET', 'POST'])
+@login_required
 def deletes_invoice(invoice_id):
     if request.method=="POST":
         invoice_id = invoice_id.replace('_', '/')
@@ -274,5 +278,40 @@ def deletes_invoice(invoice_id):
         flash(f"Invoice {invoice_id} deleted successfully!", "success")
         return redirect('/view-invoices')
 
+@app.route('/export-invoices', methods=["POST"])
+@login_required
+def export_invoices():
+    data = request.get_json()
+    invoice_ids = tuple(data.get('ids', ()))
+    placeholders = ', '.join(['%s'] * len(invoice_ids))
+
+    query = f"SELECT * FROM bill_details WHERE `Invoice no.` IN ({placeholders})"
+    cursor.execute(query, invoice_ids)
+
+    fetched_data = cursor.fetchall()
+    # Convert to pd dataframe
+    df = pandas.DataFrame(fetched_data, columns=['Id', 'Invoice no.', 'Customer', 'Contact', 'Item', 'Invoiced amount', 'Recieved amount', 'TDS 1', 'TDS 2', 'Balance amount', 'Invoice Date', 'Note'])
+    df.drop(columns=['Id'], inplace=True)
+    df.fillna("", inplace=True)
+    df = df.replace({"None": ""})
+
+    # Create an in-memory buffer for the Excel file
+    output = BytesIO()
+    
+    # Save the Excel to the buffer instead of a physical file
+    with pandas.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Invoices')
+    
+    output.seek(0) # Go to the beginning of the buffer
+
+    filename = f'Invoice-List-{datetime.now().strftime("%d-%b-%Y")}.xlsx'
+
+    # Return the file directly to the browser
+    return send_file(
+        output,
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        as_attachment=True,
+        download_name=filename
+    )
 if __name__ == '__main__':
     app.run()

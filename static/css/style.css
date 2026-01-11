@@ -372,3 +372,51 @@ body.login-page {
     background-color: #dc3545 !important;
     color: white !important;
 }
+
+/* Make checkboxes show the 'hand' cursor */
+.row-checkbox, #selectAll {
+    cursor: pointer;
+}
+
+/* Optional but recommended: Make the whole row feel clickable */
+#invoiceTable tbody tr {
+    cursor: pointer;
+}
+
+/* If you want the sortable headers to show the click icon too */
+#invoiceTable thead th {
+    cursor: pointer;
+}
+
+#invoiceTable tbody tr:hover {
+    background-color: rgba(74, 55, 40, 0.05) !important; /* Light Kinaav brown tint */
+}
+/* Hide the default checkbox */
+.row-checkbox, #selectAll {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--primary-orange);
+  border-radius: 4px;
+  position: relative;
+}
+
+/* Checked state: orange background */
+.row-checkbox:checked, #selectAll:checked {
+  background-color: var(--primary-orange);
+  border-color: var(--primary-orange);
+}
+
+/* White tick mark */
+.row-checkbox:checked::after,
+#selectAll:checked::after {
+  content: "✔";
+  color: white;
+  font-size: 14px;
+  position: absolute;
+  top: -2px;
+  left: 2px;
+}
