@@ -93,8 +93,8 @@
                             <td>{{ row.id }}</td>
                             <td data-date="{{ row.date }}">{{ row.date.strftime('%d-%b-%Y') if row.date else '' }}</td>
                             <td>{{ row.customer }}</td>
-                            <td>₹{{ row.inv_amt }}</td>
-                            <td class="fw-bold">₹{{ row.balance }}</td>
+                            <td>₹{{ row.inv_amt | inr_format }}</td>
+                            <td class="fw-bold">₹{{ row.balance | inr_format }}</td>
 
                             <td>
                                 {% if row.balance == 0 %}
